@@ -1,9 +1,56 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { cyrillicToLatinMap } from "./utils";
 import "./App.css";
 
+type Error = "language" | "wrong";
+
+type WordProgressProps = {
+  currentWord: string;
+  userInput: string;
+};
+
+function WordProgress({ currentWord, userInput }: WordProgressProps) {
+  const done = currentWord.substring(0, userInput.length);
+  const remaining = currentWord.substring(userInput.length);
+  return (
+    <div className="bold text-l">
+      <span style={{ color: "red", fontWeight: "800" }}>{done}</span>
+      {remaining}
+    </div>
+  );
+}
+
 function App() {
-  const [languageError, setLanguageError] = useState(false);
+  const [error, setError] = useState<null | Error>(null);
+  const [currentWord, setCurrentWord] = useState("сирило");
+  const [userInput, setUserInput] = useState("");
+
+  // Next correct letter is the first letter of the remaining part of the word
+  const nextCorrectLetter = currentWord.split(userInput || " ").slice(-1)[0][0];
+
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      const userLetter = e.key;
+      const isRelevantKey =
+        userLetter !== "Backspace" && !e.altKey && !e.metaKey;
+      if (!isRelevantKey) return;
+
+      const latinKey = cyrillicToLatinMap[userLetter];
+      if (!latinKey) {
+        // User is not writing in russian
+        e.preventDefault();
+        setError("language");
+        return;
+      }
+
+      if (userLetter === nextCorrectLetter) {
+        setUserInput((prev) => prev + userLetter);
+        setError(null);
+        return;
+      }
+    },
+    [nextCorrectLetter]
+  );
 
   useEffect(() => {
     document.addEventListener("keydown", handleKeyDown);
@@ -11,22 +58,7 @@ function App() {
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, []);
-
-  function handleKeyDown(e: KeyboardEvent) {
-    const isRelevantKey = e.key !== "Backspace" && !e.altKey && !e.metaKey;
-    if (!isRelevantKey) return;
-
-    const latinKey = cyrillicToLatinMap[e.key];
-    if (!latinKey) {
-      // User is not writing in russian
-      e.preventDefault();
-      setLanguageError(true);
-      return;
-    }
-
-    setLanguageError(false);
-  }
+  }, [handleKeyDown]);
 
   return (
     <div className="App">
@@ -44,9 +76,9 @@ function App() {
           <h1 style={{ fontSize: "4rem" }}>Сирило</h1>
           <div className="flex text-xl">
             <div className="">Your word is:</div>
-            <div className="bold text-l">сирило</div>
+            <WordProgress currentWord={currentWord} userInput={userInput} />
           </div>
-          {languageError && (
+          {error && (
             <div className="error">
               Whoops! it seems you are not writing cyrillic...
             </div>
