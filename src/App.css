@@ -1,8 +1,8 @@
 .wrapper {
   display: grid;
+  position: relative;
   place-items: center;
-  background: paleturquoise;
-  height: 100vh;
+  height: 90vh;
 }
 
 .suggested-key {
@@ -53,4 +53,9 @@ input {
   font-size: large;
   border-radius: var(--border-radius);
   border: 0;
+}
+
+footer {
+  cursor: pointer;
+  bottom: 20px;
 }
