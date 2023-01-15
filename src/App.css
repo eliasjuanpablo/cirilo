@@ -5,6 +5,12 @@
   height: 100vh;
 }
 
+.suggested-key {
+  padding: 0.5em;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+}
+
 .spaced-y > * + * {
   margin-bottom: 1rem;
 }

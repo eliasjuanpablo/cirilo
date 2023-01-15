@@ -2,7 +2,26 @@ import React, { useCallback, useEffect, useState } from "react";
 import { cyrillicToLatinMap } from "./utils";
 import "./App.css";
 
-type Error = "language" | "wrong";
+type ErrorTypes = "language" | "wrong";
+
+type ErrorMessageProps = { error: ErrorTypes; nextCorrectLetter: string };
+
+function ErrorMessage({ error, nextCorrectLetter }: ErrorMessageProps) {
+  if (error === "language")
+    return (
+      <div className="error">
+        Whoops! it seems you are not writing cyrillic...
+      </div>
+    );
+  return (
+    <div>
+      Mmmh, try with{" "}
+      <span className="suggested-key">
+        {cyrillicToLatinMap[nextCorrectLetter]}
+      </span>
+    </div>
+  );
+}
 
 type WordProgressProps = {
   currentWord: string;
@@ -21,7 +40,7 @@ function WordProgress({ currentWord, userInput }: WordProgressProps) {
 }
 
 function App() {
-  const [error, setError] = useState<null | Error>(null);
+  const [error, setError] = useState<null | ErrorTypes>(null);
   const [currentWord, setCurrentWord] = useState("сирило");
   const [userInput, setUserInput] = useState("");
 
@@ -48,6 +67,8 @@ function App() {
         setError(null);
         return;
       }
+
+      setError("wrong");
     },
     [nextCorrectLetter]
   );
@@ -85,9 +106,7 @@ function App() {
             <WordProgress currentWord={currentWord} userInput={userInput} />
           </div>
           {error && (
-            <div className="error">
-              Whoops! it seems you are not writing cyrillic...
-            </div>
+            <ErrorMessage error={error} nextCorrectLetter={nextCorrectLetter} />
           )}
         </div>
       </div>
