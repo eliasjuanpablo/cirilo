@@ -6,6 +6,11 @@ type ErrorTypes = "language" | "wrong";
 
 type ErrorMessageProps = { error: ErrorTypes; nextCorrectLetter: string };
 
+function getRandomElement(options: object) {
+  const keys = Object.keys(options);
+  return keys[(keys.length * Math.random()) << 0];
+}
+
 function ErrorMessage({ error, nextCorrectLetter }: ErrorMessageProps) {
   if (error === "language")
     return (
@@ -32,8 +37,8 @@ function WordProgress({ currentWord, userInput }: WordProgressProps) {
   const done = currentWord.substring(0, userInput.length);
   const remaining = currentWord.substring(userInput.length);
   return (
-    <div className="bold text-l">
-      <span style={{ color: "red", fontWeight: "800" }}>{done}</span>
+    <div className="bold text-xl">
+      <span style={{ color: "green", fontWeight: "800" }}>{done}</span>
       {remaining}
     </div>
   );
@@ -41,7 +46,8 @@ function WordProgress({ currentWord, userInput }: WordProgressProps) {
 
 function App() {
   const [error, setError] = useState<null | ErrorTypes>(null);
-  const [currentWord, setCurrentWord] = useState("сирило");
+  const [words, setWords] = useState<Record<string, string>>({});
+  const [currentWord, setCurrentWord] = useState<string>("Сирило");
   const [userInput, setUserInput] = useState("");
 
   // Next correct letter is the first letter of the remaining part of the word
@@ -51,7 +57,9 @@ function App() {
     (e: KeyboardEvent) => {
       const userLetter = e.key;
       const isRelevantKey =
-        userLetter !== "Backspace" && !e.altKey && !e.metaKey;
+        userLetter !== "Backspace" && !e.altKey && !e.metaKey && !e.ctrlKey;
+
+      // if non-relevant key (i.e. modifier) do nothing
       if (!isRelevantKey) return;
 
       const latinKey = cyrillicToLatinMap[userLetter];
@@ -63,17 +71,20 @@ function App() {
       }
 
       if (userLetter === nextCorrectLetter) {
+        // User typed right letter
         setUserInput((prev) => prev + userLetter);
         setError(null);
         return;
       }
 
+      // User typed wrong letter
       setError("wrong");
     },
     [nextCorrectLetter]
   );
 
   useEffect(() => {
+    // Initialize typing event
     document.addEventListener("keydown", handleKeyDown);
 
     return () => {
@@ -82,10 +93,22 @@ function App() {
   }, [handleKeyDown]);
 
   useEffect(() => {
+    // Check if user finished current word
     if (userInput === currentWord) {
       setUserInput("");
+      setCurrentWord(getRandomElement(words));
     }
-  }, [userInput, currentWord]);
+  }, [userInput, currentWord, words]);
+
+  useEffect(() => {
+    // Fetch and initialize words
+    fetch("words.json")
+      .then((response) => response.json())
+      .then((data) => {
+        setWords(data);
+        setCurrentWord(getRandomElement(data));
+      });
+  }, []);
 
   return (
     <div className="App">
@@ -100,14 +123,22 @@ function App() {
             width: "300px",
           }}
         >
-          <h1 style={{ fontSize: "4rem" }}>Сирило</h1>
-          <div className="flex text-xl">
+          <div className="flex spaced-y mb">
+            <div style={{ fontSize: "4rem" }}>Сирило</div>
+            <div className="text-l">Practice the cyrillic layout</div>
+          </div>
+          <div className="flex text-xl spaced-y">
             <div className="">Your word is:</div>
             <WordProgress currentWord={currentWord} userInput={userInput} />
           </div>
-          {error && (
-            <ErrorMessage error={error} nextCorrectLetter={nextCorrectLetter} />
-          )}
+          <div style={{ height: "80px" }}>
+            {error && (
+              <ErrorMessage
+                error={error}
+                nextCorrectLetter={nextCorrectLetter}
+              />
+            )}
+          </div>
         </div>
       </div>
     </div>

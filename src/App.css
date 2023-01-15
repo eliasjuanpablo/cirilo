@@ -11,6 +11,10 @@
   color: white;
 }
 
+.mb {
+  margin-bottom: 2em;
+}
+
 .spaced-y > * + * {
   margin-bottom: 1rem;
 }
