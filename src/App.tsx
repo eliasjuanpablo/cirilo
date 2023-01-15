@@ -60,6 +60,12 @@ function App() {
     };
   }, [handleKeyDown]);
 
+  useEffect(() => {
+    if (userInput === currentWord) {
+      setUserInput("");
+    }
+  }, [userInput, currentWord]);
+
   return (
     <div className="App">
       <div className="wrapper">
