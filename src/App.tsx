@@ -1,24 +1,26 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import "./App.css";
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
+      <div className="wrapper">
+        <div
+          className="flex spaced-y"
+          style={{
+            background: "rgba(255, 255, 255, 0.3)",
+            padding: "2rem 8rem",
+            borderRadius: "10px",
+          }}
         >
-          Learn React
-        </a>
-      </header>
+          <h1 style={{ fontSize: "4rem" }}>Сирило</h1>
+          <div className="flex text-xl">
+            <div className="">Your word is:</div>
+            <div className="bold text-l">сирило</div>
+          </div>
+          <input type="text" />
+        </div>
+      </div>
     </div>
   );
 }
