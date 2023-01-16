@@ -51,7 +51,7 @@ function App() {
   const [userInput, setUserInput] = useState("");
 
   // Next correct letter is the first letter of the remaining part of the word
-  const nextCorrectLetter = currentWord.split(userInput || " ").slice(-1)[0][0];
+  const nextCorrectLetter = currentWord.substring(userInput.length).charAt(0);
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
