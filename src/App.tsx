@@ -6,9 +6,8 @@ import Footer from "./components/Footer";
 import WordProgress from "./components/WordProgress";
 import "./App.css";
 
-function getRandomElement(options: object) {
-  const keys = Object.keys(options);
-  return keys[(keys.length * Math.random()) << 0];
+function getRandomElement<T>(options: T[]): T {
+  return options[(options.length * Math.random()) << 0];
 }
 
 function App() {
@@ -63,7 +62,7 @@ function App() {
     // Check if user finished current word
     if (userInput === currentWord) {
       setUserInput("");
-      setCurrentWord(getRandomElement(words));
+      setCurrentWord(getRandomElement(Object.keys(words)));
     }
   }, [userInput, currentWord, words]);
 
@@ -71,9 +70,9 @@ function App() {
     // Fetch and initialize words
     fetch("words.json")
       .then((response) => response.json())
-      .then((data) => {
+      .then((data: Record<string, string>) => {
         setWords(data);
-        setCurrentWord(getRandomElement(data));
+        setCurrentWord(getRandomElement(Object.keys(data)));
       });
   }, []);
 
@@ -96,7 +95,11 @@ function App() {
           </div>
           <div className="flex text-xl spaced-y">
             <div className="">Type anywhere:</div>
-            <WordProgress currentWord={currentWord} userInput={userInput} />
+            <WordProgress
+              currentWord={currentWord}
+              userInput={userInput}
+              meaning={words[currentWord]}
+            />
           </div>
           <div style={{ height: "80px" }}>
             {error && (

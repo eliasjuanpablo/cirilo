@@ -41,6 +41,10 @@
   font-size: 1.2em;
 }
 
+.text-secondary {
+  color: gray;
+}
+
 .bold {
   font-weight: 400;
 }
